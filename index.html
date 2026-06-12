@@ -46,11 +46,11 @@ body{font-family:var(--font);touch-action:none;user-select:none;-webkit-user-sel
 #energyText{text-align:center;color:var(--cream);font-size:11px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;margin-top:4px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 #feverShell{height:9px;border-radius:999px;background:rgba(16,36,20,.6);margin-bottom:5px;
-  border:1.5px solid #d4af37;overflow:hidden}
+  border:1.5px solid #FFD700;overflow:hidden;box-shadow:0 0 6px rgba(255,215,0,.3)}
 #feverFill{height:100%;width:0%;border-radius:999px;transition:width .15s linear;
-  background:linear-gradient(90deg,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c)}
-#energyWrap.rush #feverShell{animation:rushGlow .35s infinite alternate;border-color:#ffd93d}
-@keyframes rushGlow{from{box-shadow:0 0 6px rgba(255,217,61,.5)}to{box-shadow:0 0 20px rgba(255,217,61,.95)}}
+  background:#FFD700;box-shadow:0 0 8px #FFD700}
+#energyWrap.rush #feverShell{animation:rushGlow .35s infinite alternate;border-color:#FFD700}
+@keyframes rushGlow{from{box-shadow:0 0 8px rgba(255,215,0,.6)}to{box-shadow:0 0 24px rgba(255,215,0,1)}}
 .veh-row{display:flex;gap:10px;justify-content:center;margin:10px 0 14px}
 .veh-btn{flex:1;max-width:160px;padding:12px 8px;border-radius:18px;border:2.5px solid rgba(255,255,255,.18);
   background:rgba(255,255,255,.08);color:var(--cream);font-family:var(--font);font-size:14px;font-weight:700;
@@ -1131,8 +1131,8 @@ class Game {
     const poly = (x1,w1,x2,w2,color)=>{
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.moveTo(x1-w1, p1.y); ctx.lineTo(x1+w1, p1.y);
-      ctx.lineTo(x2+w2, p2.y - 1); ctx.lineTo(x2-w2, p2.y - 1);
+      ctx.moveTo(x1-w1, p1.y + 1.5); ctx.lineTo(x1+w1, p1.y + 1.5);
+      ctx.lineTo(x2+w2, p2.y - 1.5); ctx.lineTo(x2-w2, p2.y - 1.5);
       ctx.closePath(); ctx.fill();
     };
     // shoulders / rumble strips
