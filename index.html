@@ -69,8 +69,8 @@ body{font-family:var(--font);touch-action:none;user-select:none;-webkit-user-sel
 /* ---------- Overlays ---------- */
 .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;
   background:radial-gradient(120% 100% at 50% 0%,rgba(20,48,30,.35),rgba(8,20,12,.78));
-  opacity:0;pointer-events:none;transition:opacity .35s}
-.overlay.show{opacity:1;pointer-events:auto}
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s, visibility 0s linear .35s}
+.overlay.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .35s, visibility 0s linear 0s}
 .panel{width:min(440px,92vw);max-height:92vh;overflow:auto;border-radius:28px;padding:26px 26px 22px;text-align:center;
   background:linear-gradient(180deg,rgba(30,77,43,.92),rgba(16,40,24,.94));
   border:3px solid rgba(155,225,93,.55);box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15);
@@ -394,7 +394,7 @@ class Input {
     window.addEventListener('touchstart', e=>{
       if (e.target.closest && e.target.closest('button, .toggle, input, .veh-btn, .icon-btn')) return;
       e.preventDefault(); audio.ensure();
-      const t = e.targetTouches[0];
+      const t = e.touches[0];
       this.clientX = t.clientX;
       this.lastClientX = t.clientX;
       this.isTouchActive = true;
@@ -403,16 +403,16 @@ class Input {
     window.addEventListener('touchmove', e=>{
       if (!this.isTouchActive) return;
       e.preventDefault();
-      const t = e.targetTouches[0];
+      const t = e.touches[0];
       this.clientX = t.clientX;
     }, opt);
 
     const touchEnd = e=>{
       if (!this.isTouchActive) return;
-      if (e.targetTouches.length === 0) {
+      if (e.touches.length === 0) {
         this.isTouchActive = false;
       } else {
-        this.clientX = e.targetTouches[0].clientX;
+        this.clientX = e.touches[0].clientX;
         this.lastClientX = this.clientX;
       }
     };
@@ -1764,4 +1764,9 @@ const audio = new AudioManager();
 const game = new Game(document.getElementById('game'));
 UI.init(game);
 // sync vehicle picker to stored preference
-game.setV
+game.setVehicle(game.vehicle);
+// warm up audio on the very first interaction anywhere
+addEventListener('pointerdown', ()=>audio.ensure(), {once:true});
+</script>
+</body>
+</html>
