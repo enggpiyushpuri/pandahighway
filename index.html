@@ -384,6 +384,7 @@ class Input {
     this.game = game;
     this.targetX = 0;            // desired playerX (-1.45..1.45) — directly tracked
     this.clientX = 0;            // raw finger/pointer X coordinate
+    this.lastClientX = 0;        // for relative dragging
     this.isTouchActive = false;
     this.isPointerActive = false;
     this.keys = {};
@@ -394,6 +395,7 @@ class Input {
       e.preventDefault(); audio.ensure();
       const t = e.targetTouches[0];
       this.clientX = t.clientX;
+      this.lastClientX = t.clientX;
       this.isTouchActive = true;
     }, opt);
 
@@ -409,6 +411,7 @@ class Input {
         this.isTouchActive = false;
       } else {
         this.clientX = e.targetTouches[0].clientX;
+        this.lastClientX = this.clientX;
       }
     };
     canvas.addEventListener('touchend', touchEnd, opt);
@@ -419,6 +422,7 @@ class Input {
       if (e.pointerType === 'touch') return;
       e.preventDefault(); audio.ensure();
       this.clientX = e.clientX;
+      this.lastClientX = e.clientX;
       this.isPointerActive = true;
       try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
     }, opt);
@@ -464,8 +468,9 @@ class Input {
       if (R) this.targetX = clamp(this.targetX + 3.2*dt, -1.45, 1.45);
     } else if (this.isTouchActive || this.isPointerActive) {
       const W = innerWidth;
-      const normalized = (this.clientX / W - 0.5) / 0.35;
-      this.targetX = clamp(normalized * 1.45, -1.45, 1.45);
+      const dx = (this.clientX - this.lastClientX) / W;
+      this.targetX = clamp(this.targetX + dx * 3.5, -1.45, 1.45);
+      this.lastClientX = this.clientX;
     }
   }
 }
@@ -798,9 +803,9 @@ class Game {
         color:pick(['#8a6f4d','#a78a5f','#74583a']), type:'dot' });
     }
 
-    // direct tracking of targetX with zero lag (attached to thumb)
+    // smooth interpolation towards targetX for subway-surfers-like movement
     const lastX = this.playerX;
-    this.playerX = this.input.targetX;
+    this.playerX = lerp(this.playerX, this.input.targetX, 1 - Math.pow(0.00001, dt));
     this.playerX = clamp(this.playerX, -1.7, 1.7);
 
     // lean follows steering velocity + curve, scaled by speed
