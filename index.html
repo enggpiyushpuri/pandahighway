@@ -391,7 +391,8 @@ class Input {
     const opt = {passive:false};
 
     // ---- Native touch events (mobile-first, lowest latency, zero allocations) ----
-    canvas.addEventListener('touchstart', e=>{
+    window.addEventListener('touchstart', e=>{
+      if (e.target.closest && e.target.closest('button, .toggle, input, .veh-btn, .icon-btn')) return;
       e.preventDefault(); audio.ensure();
       const t = e.targetTouches[0];
       this.clientX = t.clientX;
@@ -399,14 +400,15 @@ class Input {
       this.isTouchActive = true;
     }, opt);
 
-    canvas.addEventListener('touchmove', e=>{
+    window.addEventListener('touchmove', e=>{
+      if (!this.isTouchActive) return;
       e.preventDefault();
       const t = e.targetTouches[0];
       this.clientX = t.clientX;
-      this.isTouchActive = true;
     }, opt);
 
     const touchEnd = e=>{
+      if (!this.isTouchActive) return;
       if (e.targetTouches.length === 0) {
         this.isTouchActive = false;
       } else {
@@ -414,33 +416,33 @@ class Input {
         this.lastClientX = this.clientX;
       }
     };
-    canvas.addEventListener('touchend', touchEnd, opt);
-    canvas.addEventListener('touchcancel', touchEnd, opt);
+    window.addEventListener('touchend', touchEnd, opt);
+    window.addEventListener('touchcancel', touchEnd, opt);
 
     // ---- Mouse / pointer fallback for desktop (zero allocations) ----
-    canvas.addEventListener('pointerdown', e=>{
+    window.addEventListener('pointerdown', e=>{
       if (e.pointerType === 'touch') return;
+      if (e.target.closest && e.target.closest('button, .toggle, input, .veh-btn, .icon-btn')) return;
       e.preventDefault(); audio.ensure();
       this.clientX = e.clientX;
       this.lastClientX = e.clientX;
       this.isPointerActive = true;
-      try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
     }, opt);
 
-    canvas.addEventListener('pointermove', e=>{
+    window.addEventListener('pointermove', e=>{
+      if (!this.isPointerActive) return;
       if (e.pointerType === 'touch') return;
       e.preventDefault();
       this.clientX = e.clientX;
-      this.isPointerActive = true;
     }, opt);
 
     const pUp = e=>{
+      if (!this.isPointerActive) return;
       if (e.pointerType === 'touch') return;
       this.isPointerActive = false;
-      try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
     };
-    canvas.addEventListener('pointerup', pUp);
-    canvas.addEventListener('pointercancel', pUp);
+    window.addEventListener('pointerup', pUp);
+    window.addEventListener('pointercancel', pUp);
 
     // ---- Prevent iOS Safari gesture hijacking (pinch-zoom, etc.) ----
     canvas.addEventListener('gesturestart', e=>e.preventDefault(), opt);
@@ -1762,9 +1764,4 @@ const audio = new AudioManager();
 const game = new Game(document.getElementById('game'));
 UI.init(game);
 // sync vehicle picker to stored preference
-game.setVehicle(game.vehicle);
-// warm up audio on the very first interaction anywhere
-addEventListener('pointerdown', ()=>audio.ensure(), {once:true});
-</script>
-</body>
-</html>
+game.setV
